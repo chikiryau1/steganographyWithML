@@ -1,4 +1,2 @@
-import imageProcessing
-
-imageProcessing.imageReader() 
-imageProcessing.imageWriter() 
+import LSB
+import Image
