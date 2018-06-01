@@ -6,7 +6,7 @@ def main():
     image.toArray()
     image.divide(8, 8)
     
-    lsb = LSB(image.divided[0], 'has')
+    lsb = LSB(image.divided[0], 'Hello World!')
     lsb.encrypt()
     image.divided[0] = lsb.image
 
