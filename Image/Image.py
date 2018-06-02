@@ -21,12 +21,24 @@ class Img(object):
     def setImageData(self, arrayOfPixels):
         pass
 
+    def toYCbCr(self):
+        return numpy.array(self.img.convert('YCbCr'))
+
     def toArray(self):
         """
             Sets image as array of RGB components. 
         """
         self.RGB = numpy.array(self.img) 
         del self.img
+
+    def getR(self):
+        pass
+
+    def getG(self):
+        pass
+
+    def getB(self):
+        pass
 
     def toImage(self, path):
         """
