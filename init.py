@@ -1,6 +1,6 @@
 from LSB.LSB import LSB
 from Image.Image import Img
-from wavelets.wavelets import DWT, plot_wavelet_decomposition, iwt2, haarWavelet
+from wavelets.wavelets import DWT,  haarWavelet
 
 def main():
     image = Img('testImages/4.2.03.tiff')
