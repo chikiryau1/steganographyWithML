@@ -34,12 +34,29 @@ def plot_wavelet_decomposition(image, level=1):
     plt.show() 
 
 def haarWavelet(vector):
-    h = np.array()
-    g = np.array()
-    for e in range(vector):
-        h.append((vector[e] + vector[e+1]) / 2)
-        g.append((vector[e] - vector[e+1]) / 2)
-        e += 1 
+    l = len(vector) // 2
+    h = np.zeros((l,), dtype='float64')
+    g = np.zeros((l,), dtype='float64')
+    for e in range(l):
+        h[e] = (float(vector[e * 2]) + float(vector[e * 2 + 1])) / 2
+        g[e] = (float(vector[e * 2]) - float(vector[e * 2 + 1])) / 2
+
+    # x = np.arange(64)
+    
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(vector, color='green')
+
+    plt.subplot(223)
+    plt.plot(h, 'bo--', linewidth=1, markersize=5)
+
+    plt.subplot(223) 
+    plt.plot(g, 'bo-', linewidth=1, markersize=5, color='red')
+
+
+    plt.show()   
+    print(h)
+    print(g)
 
 def _iwt(array):
     output = np.zeros_like(array)

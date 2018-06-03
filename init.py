@@ -1,11 +1,11 @@
 from LSB.LSB import LSB
 from Image.Image import Img
-from wavelets.wavelets import DWT, plot_wavelet_decomposition, iwt2
+from wavelets.wavelets import DWT, plot_wavelet_decomposition, iwt2, haarWavelet
 
 def main():
     image = Img('testImages/4.2.03.tiff')
     image.toArray()
-    # image.divide(8, 8)
+    image.divide(8, 8)
     
     # lsb = LSB(image.divided[0], 'Hello World!')
     # lsb.encrypt()
@@ -25,9 +25,7 @@ def main():
     # ycbcr = image.toYCbCr()
     # print(ycbcr)
 
-    print(image.RGB[0])
-    plot_wavelet_decomposition(image.RGB)
-
+    haarWavelet(image.vectorizeChannel(image.getRGBComponent(image.divided[0], channel='G')))
 
 if __name__ == '__main__':
     main()

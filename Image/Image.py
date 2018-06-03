@@ -31,14 +31,19 @@ class Img(object):
         self.RGB = numpy.array(self.img) 
         del self.img
 
-    def getR(self):
-        pass
+    def getRGBComponent(self, arr, channel='R'):
+        h, w, _ = arr.shape
+        channelIndex = 0 if channel == 'R' else (1 if channel == 'G' else 'B') 
+        print(channelIndex)
+        arrChannel = numpy.zeros((h, w), dtype='uint8')
+        for h in range(len(arr)):
+            for w in range(len(arr[h])):
+                arrChannel[h][w] = arr[h][w][0]
+                
+        return arrChannel
 
-    def getG(self):
-        pass
-
-    def getB(self):
-        pass
+    def vectorizeChannel(self, channelArray):
+        return channelArray.flatten()
 
     def toImage(self, path):
         """
