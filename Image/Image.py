@@ -33,7 +33,7 @@ class Img(object):
 
     def getRGBComponent(self, arr, channel='R'):
         h, w, _ = arr.shape
-        channelIndex = 0 if channel == 'R' else (1 if channel == 'G' else 'B') 
+        channelIndex = 0 if channel == 'R' else (1 if channel == 'G' else 2) 
         print(channelIndex)
         arrChannel = numpy.zeros((h, w), dtype='uint8')
         for h in range(len(arr)):
