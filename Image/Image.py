@@ -34,12 +34,11 @@ class Img(object):
     def getRGBComponent(self, arr, channel='R'):
         h, w, _ = arr.shape
         channelIndex = 0 if channel == 'R' else (1 if channel == 'G' else 2) 
-        print(channelIndex)
+        # print(channelIndex)
         arrChannel = numpy.zeros((h, w), dtype='uint8')
         for h in range(len(arr)):
             for w in range(len(arr[h])):
-                arrChannel[h][w] = arr[h][w][0]
-                
+                arrChannel[h][w] = arr[h][w][channelIndex]
         return arrChannel
 
     def vectorizeChannel(self, channelArray):
