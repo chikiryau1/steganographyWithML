@@ -1,17 +1,11 @@
-import pywt
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-
-def DWT(data):
-    w = pywt.Wavelet('sym3')
-    cA, cD = pywt.dwt(data, wavelet=w, mode='constant')
-    print(cA, cD)        
+from PIL import Image
 
 def haarWavelet(vector, dm=1):
     if(dm == 1):
         l = len(vector) 
-        print('to', l // 2)
         h = np.zeros((l // 2,), dtype='float64')
         g = np.zeros((l // 2,), dtype='float64')
 
@@ -48,30 +42,30 @@ def haarWavelet(vector, dm=1):
         
         return {'LL': LL, 'HL': HL, 'LH': LH, 'HH': HH}
 
-def joinToRgb(r, g, b, dm=1):
-    if dm == 1:
-        h = len(r)
-        img = np.zeros((h, 3), dtype='uint8')
+def imageDWT(image, pathToNewImage, level=1):
+    R = image.getRGBComponent(image.RGB, channel='R')
+    B = image.getRGBComponent(image.RGB, channel='B')
+    G = image.getRGBComponent(image.RGB, channel='G')
 
-        for i in range(h):
-            img[i][0] = int(r[i])
-            img[i][1] = int(g[i])
-            img[i][2] = int(b[i])
+    for l in range(1, level + 1):
+        R = haarWavelet(R, 2)
+        G = haarWavelet(G, 2)
+        B = haarWavelet(B, 2)
 
-        img1 = img.reshape(int(math.sqrt(len(img))), int(math.sqrt(len(img))), 3) 
-        return img1
+        HH = image.joinToRgb(R.get('HH'), G.get('HH'), B.get('HH'), dm=2)
+        HL = image.joinToRgb(R.get('HL'), G.get('HL'), B.get('HL'), dm=2)
+        LH = image.joinToRgb(R.get('LH'), G.get('LH'), B.get('LH'), dm=2)
+        LL = image.joinToRgb(R.get('LL'), G.get('LL'), B.get('LL'), dm=2)
 
-    if dm == 2:
-        h, w = r.shape
-        img = np.zeros((h, w, 3), dtype='uint8')
+        topPart = np.concatenate((LL, HL), axis=1)
+        bottomPart = np.concatenate((LH, HH), axis=1)
 
-        for i in range(h):
-            for j in range(w):
-                img[i][j][0] = int(r[i][j])
-                img[i][j][1] = int(g[i][j])
-                img[i][j][2] = int(b[i][j])
+        Image.fromarray(np.concatenate((topPart, bottomPart), axis=0)).save(pathToNewImage + 'DWT_level_' + str(l) + '.tiff')
 
-        return img
+        R = R.get('LL')
+        G = G.get('LL')
+        B = B.get('LL')
+
 
 def waveletPlots(vector, h, g):
     pass
