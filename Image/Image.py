@@ -94,3 +94,4 @@ class Img(object):
                     img[i][j][2] = int(b[i][j])
 
             return img
+
