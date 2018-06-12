@@ -4,9 +4,10 @@ import math
 
 class Img(object):
 
-    def __init__(self, path):
+    def __init__(self, path, array=[]):
         self.path = path
-        self.img = Image.open(path)
+        self.img = Image.open(path) if path != '' else Image.fromarray(array)
+    
 
     def toByteArray(self):
         """
@@ -30,7 +31,7 @@ class Img(object):
             Sets image as array of RGB components. 
         """
         self.RGB = numpy.array(self.img) 
-        del self.img
+        del self.img 
 
     def getRGBComponent(self, arr, channel='R'):
         h, w, _ = arr.shape
@@ -51,7 +52,7 @@ class Img(object):
             writes it into file.
         """
         Image.fromarray(self.joined).save(path)
-        del self.joined  
+        # del self.joined  
 
     def divide(self, width, height):
         """

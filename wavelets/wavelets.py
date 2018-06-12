@@ -82,7 +82,9 @@ def getContrast(backgroundArray, featureArray):
         for j in range(w):
             backgroundBrightness = getPixelBrightness(backgroundArray[i][j])
             featureBrightness = getPixelBrightness(featureArray[i][j])
-            vector[index] = (featureBrightness - backgroundBrightness) / backgroundBrightness
+            # print(backgroundArray[i][j], featureArray[i][j])
+            vector[index] = (featureBrightness - backgroundBrightness) / backgroundBrightness if backgroundBrightness != 0 else 0
+        
             index += 1
     
     return vector
