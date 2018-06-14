@@ -1,4 +1,3 @@
-from LSB.LSB import LSB, textToBin
 from Image.Image import Img
 from PIL import Image
 from matplotlib import cm
@@ -9,6 +8,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
 from som import SOM
+from methods import Steganography
 
 def getContrastPoints(image):
 
@@ -43,19 +43,19 @@ def getContrastPoints(image):
     return contrastPoints
 
 def contrastPointsPlots(contrastPoints, mapping=''):
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    # fig = plt.figure()
+    # ax = fig.gca(projection='3d')
 
     # Make data.
-    X = numpy.arange(0, int(math.sqrt(len(contrastPoints))), 1)
-    Y = numpy.arange(0, int(math.sqrt(len(contrastPoints))), 1)
-    X, Y = numpy.meshgrid(X, Y)
+    # X = numpy.arange(0, int(math.sqrt(len(contrastPoints))), 1)
+    # Y = numpy.arange(0, int(math.sqrt(len(contrastPoints))), 1)
+    # X, Y = numpy.meshgrid(X, Y)
 
-    Z = contrastPoints.reshape((int(math.sqrt(len(contrastPoints))), int(math.sqrt(len(contrastPoints)))))
+    # Z = contrastPoints.reshape((int(math.sqrt(len(contrastPoints))), int(math.sqrt(len(contrastPoints)))))
 
-    ax.set_xlabel('height number of block')
-    ax.set_ylabel('width number of block')
-    ax.set_zlabel('contrast')
+    # ax.set_xlabel('height number of block')
+    # ax.set_ylabel('width number of block')
+    # ax.set_zlabel('contrast')
     # ax.scatter(X, Y, Z)
 
     x = numpy.arange(0, len(contrastPoints), 1)
@@ -76,30 +76,15 @@ def contrastPointsPlots(contrastPoints, mapping=''):
     # print(len(textToBin('Hello')))
 
 def som(m, n, dim, iterations, data):
-    #Training inputs for RGBcolors
-    classNames = \
-        ['A1', 'A2', 'A3']
-    
-    #Train a 20x30 SOM with 400 iterations
     som = SOM(m, n, dim, iterations)
     som.train(data)
-    
-    #Get output grid
     image_grid = som.get_centroids()
-    
-    print(len(image_grid))
     grid = numpy.zeros((len(image_grid), 2))
+   
     for i in range(len(image_grid)):
         grid[i] = [i, image_grid[i][0]]
-    #Map colours to their closest neurons
+   
     mapped = som.map_vects(data)
-    #Plot
-    # plt.imshow(mapped)
-    # plt.title('Color SOM')
-    # for i, k in enumerate(mapped):
-    #     plt.text(k[1], k[0], classNames[i], ha='center', va='center',
-    #             bbox=dict(facecolor='white', alpha=0.5, lw=0))
-    # plt.show()
     return mapped
 
 def testTrain():
@@ -145,32 +130,39 @@ def testTrain():
     plt.show()
 
 def main():
+    # --------------------------- LSB ---------------------------------------
+    # s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'lsb', 'newBaboon.tiff')
+    # s.encrypt()
+    # print(s.decrypt())
+    # --------------------------- /LSB ---------------------------------------
 
-    image = Img('testImages/4.2.03.tiff')
-    image.toArray()
-    image.divide(8, 8)
-    contrastPoints = getContrastPoints(image)
+    # --------------------------- LSB ---------------------------------------
+    s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'kohonen', 'newBaboon.tiff')
+    s.encrypt()
+    print(s.decrypt())
+    # --------------------------- /LSB ---------------------------------------
+
+    # image = Img('testImages/4.2.03.tiff')
+    # image.toArray()
+    # image.divide(8, 8)
+    # print(image.divided.shape)
+    # contrastPoints = getContrastPoints(image)
     # contrastPointsPlots(contrastPoints)
 
-    trainData = numpy.zeros((len(contrastPoints), 1))
+    # trainData = numpy.zeros((len(contrastPoints), 1))
 
-    for i in range(len(contrastPoints)):
-        trainData[i] = [contrastPoints[i]]
+    # for i in range(len(contrastPoints)):
+        # trainData[i] = [contrastPoints[i]]
+
+    # print(trainData.shape, trainData[0])
+
+    # mapped = som(3, 1, 1, 50, trainData)
+    # contrastPointsPlots(contrastPoints, mapped)
+    # testTrain()
 
 
     
-    # print(trainData.shape, trainData[0])
 
-    mapped = som(3, 1, 1, 5, trainData)
-
-    print(mapped[4000], contrastPoints[4000])
-    print(mapped[1000], contrastPoints[1000])
-    print(mapped[0], contrastPoints[0])
-    print(mapped[4095], contrastPoints[4095])
-    contrastPointsPlots(contrastPoints, mapped)
-    # testTrain()
-    # lsb = LSB(image.divided[0], 'Hello World!')
-    # lsb.encrypt()
     # image.divided[0] = lsb.image
 
     # image.joinBlocks()
@@ -179,9 +171,6 @@ def main():
     # image2 = Img('test1.tiff')
     # image2.toArray()
     # image2.divide(8, 8)
-
-    # lsb.decrypt(image2.divided[0], lsb.key)
-    # print('message: ', lsb.decryptedMessage)
     
     # DWT(lsb.image)
     # ycbcr = image.toYCbCr()

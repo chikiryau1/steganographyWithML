@@ -54,6 +54,9 @@ class Img(object):
         Image.fromarray(self.joined).save(path)
         # del self.joined  
 
+    def fromArrayToImage(self, path):
+        Image.fromarray(self.RGB).save(path)
+
     def divide(self, width, height):
         """
             Method divides an image to blocks with size width*height.

@@ -31,6 +31,10 @@ class LSB(object):
         """
         data = list(changeByte)
         data[len(data)-1] = embedData
+
+        for b in range(len(embedData)):
+            print(len(data) - len(embedData) + b, 'to', b)
+            data[len(data) - len(embedData) + b] = embedData[b] 
         return ''.join(data)
         
     def decrypt(self, data, key):
