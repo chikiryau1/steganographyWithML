@@ -26,7 +26,8 @@ class Steganography(object):
             self.image.divide(8,8)
             k = Kohonen(self.image.divided, self.message)          
             k.setContrastPoints()
-            k.som(3, 1, 1, 5)
+            # k.som(3, 1, 1, 5)
+            k.som3(3, 1, 3, 10)
             k.encrypt()
             self.key = k.key
             self.image.divided = k.image

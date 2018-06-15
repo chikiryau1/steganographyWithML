@@ -9,6 +9,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import math
 from som import SOM
 from methods import Steganography
+from KOHONEN.KOHONEN import Kohonen
 
 def getContrastPoints(image):
 
@@ -75,6 +76,23 @@ def contrastPointsPlots(contrastPoints, mapping=''):
 
     # print(len(textToBin('Hello')))
 
+def plot3d(x, y, z, mapping=''):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    
+    if mapping != '':
+        for _x, _y, _z, m in zip(x, y, z, mapping):
+            c = m[0] + m[1] 
+            color = 'red' if c == 0 else ('green' if c == 1 else 'blue')              
+            ax.scatter(_x, _y, _z, c=color, s=0.7)
+    else:
+        ax.scatter(x, y, z)
+    
+    ax.set_xlabel('mean horizontal contrast')
+    ax.set_ylabel('mean diagonal contrast')
+    ax.set_zlabel('mean vertical contrast')    
+    plt.show()
+
 def som(m, n, dim, iterations, data):
     som = SOM(m, n, dim, iterations)
     som.train(data)
@@ -136,12 +154,20 @@ def main():
     # print(s.decrypt())
     # --------------------------- /LSB ---------------------------------------
 
-    # --------------------------- LSB ---------------------------------------
+    # --------------------------- KOHONEN ---------------------------------------
     s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'kohonen', 'newBaboon.tiff')
     s.encrypt()
     print(s.decrypt())
-    # --------------------------- /LSB ---------------------------------------
-
+    # --------------------------- /KOHONEN ---------------------------------------
+    # image = Img('testImages/4.2.03.tiff')
+    # image.toArray()
+    # image.divide(8, 8)
+    # k = Kohonen(image.divided, '')          
+    # k.setContrastPoints()
+    # k.som3(3, 1, 3, 10)
+    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
+    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping3)
+    
     # image = Img('testImages/4.2.03.tiff')
     # image.toArray()
     # image.divide(8, 8)

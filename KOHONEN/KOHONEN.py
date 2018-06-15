@@ -17,6 +17,7 @@ class Kohonen(object):
         msg = textToBin(self.message)
         self.key = len(msg)
 
+
         for block, blockClassMap in zip(self.image, self.blocksMapping): 
             blockClass = blockClassMap[0] + blockClassMap[1]
 
@@ -60,8 +61,7 @@ class Kohonen(object):
                             bitsToSubstitute = msg[messageStep]
                         
                         if (blockClass == self.mappingDict.get('least')):
-                            bitsToSubstitute = [msg[messageStep], msg[messageStep]]
-
+                            bitsToSubstitute = [msg[messageStep], msg[messageStep + 1]]
                         block[i][j][channel] = int(self.substitute(get_bin(block[i][j][channel], 8), bitsToSubstitute), 2)
                         d = list(self.mappingDict.keys())[list(self.mappingDict.values()).index(blockClass)]
                         messageStep += 1 if d == 'mean' else 2
@@ -113,24 +113,29 @@ class Kohonen(object):
                     else:
                         if (blockClass == '01'):
                             step = 1
+                            # messageStep += 1
+                            # continue
                         if (blockClass == '10'):
                             step = 2
+                            # messageStep += step
+                            # continue
 
                     # print(blockClass)
                     for channel in range(len(block[i][j])):
                         extracted = get_bin(block[i][j][channel],  8)
                         msg += extracted[len(extracted) - step:]
-                        print(messageStep, extracted[len(extracted) - step:])
                         messageStep += step
                         if(messageStep == key):
                             break
-        print(msg)
         self.decryptedMessage = frombits(msg)
     
     def setContrastPoints(self):
         # steps 1 - 3
         image = self.image
         contrastPoints = numpy.zeros(len(image))
+        horizontalContrastPoints = numpy.zeros(len(image))
+        verticalContrastPoints = numpy.zeros(len(image))
+        diagonalContrastPoints = numpy.zeros(len(image))
 
         for index in range(len(image)):
 
@@ -144,13 +149,64 @@ class Kohonen(object):
 
             C = 0
 
+            sumVertical = 0
+            sumHorizontal = 0
+            sumDiagonal = 0
+            
+
             for i in globalContrast:
                 C += i
-
+            
+            for j in range(len(verticalContrast)):
+                sumDiagonal += diagonalContrast[j]
+                sumVertical += verticalContrast[j]
+                sumHorizontal += horizontalContrast[j]
+                
             contrastPoints[index] = C if C < 150 else 0
+            horizontalContrastPoints[index] = sumHorizontal / len(horizontalContrast) if sumHorizontal < 50 else 0
+            verticalContrastPoints[index] = sumVertical / len(verticalContrast) if sumVertical < 50 else 0
+            diagonalContrastPoints[index] = sumDiagonal / len(diagonalContrast) if sumDiagonal < 50 else 0
 
+        self.horizontalContrast = horizontalContrastPoints
+        self.verticalContrast = verticalContrastPoints
+        self.diagonalContrast = diagonalContrastPoints
+        
         self.contrastPoints = contrastPoints
 
+    def som3(self, m, n, dim, iterations):
+        # step 4
+        trainData = numpy.zeros((len(self.contrastPoints), 3))
+
+        for i in range(len(self.contrastPoints)):
+            trainData[i] = [self.diagonalContrast[i], self.verticalContrast[i], self.horizontalContrast[i]]
+
+        som = SOM(m, n, dim, iterations)
+        som.train(trainData)    
+        mapped = som.map_vects(trainData)
+        d0 = 0
+        d1 = 0
+        d2 = 0
+
+        for d, m in zip(trainData, mapped):
+            mapv = m[0] + m[1]
+            
+            if (d0 == 0 and mapv == 0):
+                d0 = d[0] if d0 < d[0] else d0
+
+            if (d1 == 0  and mapv == 1):    
+                d1 = d[0] if d1 < d[0] else d1
+                
+            if (d2 == 0  and mapv == 2): 
+                d2 = d[0] if d2 < d[0] else d2
+                
+        arr = numpy.array([d0, d1, d2])
+        most = numpy.argmax(arr)
+        numpy.delete(arr, most, 0)
+        least = numpy.argmin(arr)
+        numpy.delete(arr, least, 0)
+        mean = 0 if (arr[most] == d1 or arr[most] == d2) and (arr[least] == d1 or arr[least] == d2) else (1 if (arr[most] == d0 or arr[most] == d2) and (arr[least] == d0 or arr[least] == d2) else 2)
+        self.mappingDict = {'least':  least, 'mean': mean, 'most': most}  
+        self.blocksMapping = mapped
 
     def som(self, m, n, dim, iterations):
         # step 4
