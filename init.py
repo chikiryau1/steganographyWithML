@@ -43,7 +43,7 @@ def getContrastPoints(image):
 
     return contrastPoints
 
-def contrastPointsPlots(contrastPoints, mapping=''):
+def contrastPointsPlots(contrastPoints, mapping='', neurons=''):
     # fig = plt.figure()
     # ax = fig.gca(projection='3d')
 
@@ -68,7 +68,7 @@ def contrastPointsPlots(contrastPoints, mapping=''):
             # print(col)
             c = col[0] + col[1]   
             color = 'red' if c == 0 else ('green' if c == 1 else 'blue')
-            plt.scatter(_x, _y, marker='o', c=color)
+            plt.scatter(_x, _y, marker='o', c=color)        
     else:
         plt.plot(numpy.arange(0, len(contrastPoints), 1), contrastPoints, 'o', ms=0.5)
 
@@ -76,7 +76,7 @@ def contrastPointsPlots(contrastPoints, mapping=''):
 
     # print(len(textToBin('Hello')))
 
-def plot3d(x, y, z, mapping=''):
+def plot3d(x, y, z, mapping='', neurons='', path=''):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     
@@ -84,14 +84,29 @@ def plot3d(x, y, z, mapping=''):
         for _x, _y, _z, m in zip(x, y, z, mapping):
             c = m[0] + m[1] 
             color = 'red' if c == 0 else ('green' if c == 1 else 'blue')              
-            ax.scatter(_x, _y, _z, c=color, s=0.7)
+            ax.scatter(_x, _y, _z, c=color, s=0.8)
+
+        if neurons != '':
+            i = 1
+            for neuron in neurons:
+                i += 1
+                ax.scatter(neuron[0][0], neuron[0][1], neuron[0][2], marker='x', c='black', label='Neuron location' + str(i))
+        
     else:
-        ax.scatter(x, y, z)
+        ax.scatter(x, y, z, s=0.8)
     
     ax.set_xlabel('mean horizontal contrast')
     ax.set_ylabel('mean diagonal contrast')
     ax.set_zlabel('mean vertical contrast')    
-    plt.show()
+    # plt.show()
+    if path != '':
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        # Put a legend to the right of the current axis
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        fig.savefig(path, format='eps',  dpi=1000)
+    else:
+        plt.show()
 
 def som(m, n, dim, iterations, data):
     som = SOM(m, n, dim, iterations)
@@ -155,75 +170,19 @@ def main():
     # --------------------------- /LSB ---------------------------------------
 
     # --------------------------- KOHONEN ---------------------------------------
-    s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'kohonen', 'newBaboon.tiff')
-    s.encrypt()
-    print(s.decrypt())
+    # s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'kohonen', 'newBaboon.tiff')
+    # s.encrypt()
+    # print(s.decrypt())
     # --------------------------- /KOHONEN ---------------------------------------
-    # image = Img('testImages/4.2.03.tiff')
-    # image.toArray()
-    # image.divide(8, 8)
-    # k = Kohonen(image.divided, '')          
-    # k.setContrastPoints()
-    # k.som3(3, 1, 3, 10)
-    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
-    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping3)
+    image = Img('testImages/4.2.03.tiff')
+    image.toArray()
+    image.divide(8, 8)
+    k = Kohonen(image.divided, '')          
+    k.setContrastPoints()
+    k.som3(3, 1, 3, 10)
+    plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
+    plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping, k.neuronsMap)
     
-    # image = Img('testImages/4.2.03.tiff')
-    # image.toArray()
-    # image.divide(8, 8)
-    # print(image.divided.shape)
-    # contrastPoints = getContrastPoints(image)
-    # contrastPointsPlots(contrastPoints)
-
-    # trainData = numpy.zeros((len(contrastPoints), 1))
-
-    # for i in range(len(contrastPoints)):
-        # trainData[i] = [contrastPoints[i]]
-
-    # print(trainData.shape, trainData[0])
-
-    # mapped = som(3, 1, 1, 50, trainData)
-    # contrastPointsPlots(contrastPoints, mapped)
-    # testTrain()
-
-
-    
-
-    # image.divided[0] = lsb.image
-
-    # image.joinBlocks()
-    # image.toImage('test1.tiff')
-
-    # image2 = Img('test1.tiff')
-    # image2.toArray()
-    # image2.divide(8, 8)
-    
-    # DWT(lsb.image)
-    # ycbcr = image.toYCbCr()
-    # print(ycbcr)
-
-    # image = Img('testImages/4.2.03.tiff')
-    # image.toArray()
-    # imageDWT(image, 'BABOON_', 1)
-
-    # image = Img('testImages/4.2.05.tiff')
-    # image.toArray()
-    # imageDWT(image, 'AIRPLANE_', 1)
-    
-    # image = Img('testImages/4.2.06.tiff')
-    # image.toArray()
-    # imageDWT(image, 'SAILBOAT_', 1)
-    # image = Img('testImages/4.2.07.tiff')
-    # image.toArray()
-    # imageDWT(image, 'PEPPERS_', 1)
-    # index = 4070
-    # print(image.divided.shape)
-
-    # image.joinBlocks()
-    # image.toImage('image.tiff') 
-    
-    # print(contrastPoints.reshape((64, 64)))
-
    
 
 if __name__ == '__main__':

@@ -102,8 +102,12 @@ class SOM(object):
             bmu_distance_squares = tf.reduce_sum(tf.pow(tf.subtract(
                 self._location_vects, tf.stack(
                     [bmu_loc for i in range(m*n)])), 2), 1)
+            
+            # print(bmu_distance_squares)
+
             neighbourhood_func = tf.exp(tf.negative(tf.div(tf.cast(
                 bmu_distance_squares, "float32"), tf.pow(_sigma_op, 2))))
+
             learning_rate_op = tf.multiply(_alpha_op, neighbourhood_func)
  
             #Finally, the op that will use learning_rate_op to update

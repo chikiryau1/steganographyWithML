@@ -144,7 +144,7 @@ class Kohonen(object):
             decomposed = imageDWT(image0, '', level=1)
             verticalContrast = getContrast(decomposed.get('LL'), decomposed.get('LH'))
             horizontalContrast = getContrast(decomposed.get('LL'), decomposed.get('HL'))
-            diagonalContrast = getContrast(decomposed.get('LL'), decomposed.get('LH'))
+            diagonalContrast = getContrast(decomposed.get('LL'), decomposed.get('HH'))
             globalContrast = getGlobalContrast(verticalContrast, horizontalContrast, diagonalContrast)
 
             C = 0
@@ -163,14 +163,14 @@ class Kohonen(object):
                 sumHorizontal += horizontalContrast[j]
                 
             contrastPoints[index] = C if C < 150 else 0
-            horizontalContrastPoints[index] = sumHorizontal / len(horizontalContrast) if sumHorizontal < 50 else 0
-            verticalContrastPoints[index] = sumVertical / len(verticalContrast) if sumVertical < 50 else 0
-            diagonalContrastPoints[index] = sumDiagonal / len(diagonalContrast) if sumDiagonal < 50 else 0
-
+            horizontalContrastPoints[index] = sumHorizontal / len(horizontalContrast) if sumHorizontal < 30 else 0
+            verticalContrastPoints[index] = sumVertical / len(verticalContrast) if sumVertical < 30 else 0
+            diagonalContrastPoints[index] = sumDiagonal / len(diagonalContrast) if sumDiagonal < 30 else 0
+       
         self.horizontalContrast = horizontalContrastPoints
         self.verticalContrast = verticalContrastPoints
         self.diagonalContrast = diagonalContrastPoints
-        
+        print(diagonalContrastPoints[5], verticalContrastPoints[5], horizontalContrastPoints[5])
         self.contrastPoints = contrastPoints
 
     def som3(self, m, n, dim, iterations):
@@ -205,8 +205,10 @@ class Kohonen(object):
         least = numpy.argmin(arr)
         numpy.delete(arr, least, 0)
         mean = 0 if (arr[most] == d1 or arr[most] == d2) and (arr[least] == d1 or arr[least] == d2) else (1 if (arr[most] == d0 or arr[most] == d2) and (arr[least] == d0 or arr[least] == d2) else 2)
+       
         self.mappingDict = {'least':  least, 'mean': mean, 'most': most}  
         self.blocksMapping = mapped
+        self.neuronsMap = som.get_centroids()
 
     def som(self, m, n, dim, iterations):
         # step 4
