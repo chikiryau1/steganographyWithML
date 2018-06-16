@@ -12,6 +12,7 @@ class LSB(object):
         """
         messageStep = 0
         msg = textToBin(self.message)
+        print(len(msg) / 8)
         self.key = len(msg)
         for i in range(len(self.image)):
             if(messageStep == len(msg)):
@@ -33,7 +34,6 @@ class LSB(object):
         data[len(data)-1] = embedData
 
         for b in range(len(embedData)):
-            print(len(data) - len(embedData) + b, 'to', b)
             data[len(data) - len(embedData) + b] = embedData[b] 
         return ''.join(data)
         

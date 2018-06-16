@@ -10,6 +10,7 @@ import math
 from som import SOM
 from methods import Steganography
 from KOHONEN.KOHONEN import Kohonen
+from analysis import Analysis
 
 def getContrastPoints(image):
 
@@ -164,9 +165,9 @@ def testTrain():
 
 def main():
     # --------------------------- LSB ---------------------------------------
-    # s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'lsb', 'newBaboon.tiff')
-    # s.encrypt()
-    # print(s.decrypt())
+    s = Steganography('testImages/4.2.03.tiff', 'Comparative analysis of steganography algorithms based on machine learning, Chernyaev Ilya, MIPT 2018', 'lsb', 'newBaboon.tiff')
+    s.encrypt()
+    print(s.decrypt())
     # --------------------------- /LSB ---------------------------------------
 
     # --------------------------- KOHONEN ---------------------------------------
@@ -174,17 +175,28 @@ def main():
     # s.encrypt()
     # print(s.decrypt())
     # --------------------------- /KOHONEN ---------------------------------------
-    image = Img('testImages/4.2.03.tiff')
-    image.toArray()
-    image.divide(8, 8)
-    k = Kohonen(image.divided, '')          
-    k.setContrastPoints()
-    k.som3(3, 1, 3, 10)
-    plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
-    plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping, k.neuronsMap)
-    
-   
 
+    # image = Img('testImages/4.2.03.tiff')
+    # image.toArray()
+    # image.divide(8, 8)
+    # k = Kohonen(image.divided, '')          
+    # k.setContrastPoints()
+    # k.som3(3, 1, 3, 10)
+    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
+    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping, k.neuronsMap)
+    
+    a = Analysis('testImages/4.2.03.tiff', 'newBaboon.tiff')
+    a.MSE()
+    print(a.mse)
+    a.corr()
+    print(a.correlation)
+    a.SSIM()
+    print(a.ssim)
+    a.Fusion()
+    print(a.fusion)
+    # a.Fusion1()
+    # print(a.fusion1)
+    
 if __name__ == '__main__':
     main()
 
