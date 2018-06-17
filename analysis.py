@@ -66,7 +66,7 @@ class Analysis(object):
         c1 = (0.01 * (2 ** 24 - 1))**2
         c2 = (0.03 *  (2 ** 24 - 1))**2
         
-        self.ssim = (((2 * self.meanOriginal * self.meanStego + c1) * (2 * self.covariance + c2)) /
+        self.ssim = (((2 * self.meanOriginal * self.meanStego + c1) * (self.covariance + c2)) /
         ((self.meanOriginal ** 2 + self.meanStego ** 2 + c1) * (self.stegoStd + self.originalStd + c2)))
 
     def Fusion(self):
