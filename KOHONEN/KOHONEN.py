@@ -2,6 +2,7 @@ from wavelets.wavelets import imageDWT, haarWavelet, getContrast, getGlobalContr
 from Image.Image import Img
 import numpy   
 from som import SOM
+from matplotlib import pyplot as plt
 
 class Kohonen(object):
 
@@ -170,7 +171,6 @@ class Kohonen(object):
         self.horizontalContrast = horizontalContrastPoints
         self.verticalContrast = verticalContrastPoints
         self.diagonalContrast = diagonalContrastPoints
-        print(diagonalContrastPoints[5], verticalContrastPoints[5], horizontalContrastPoints[5])
         self.contrastPoints = contrastPoints
 
     def som3(self, m, n, dim, iterations):
@@ -243,7 +243,55 @@ class Kohonen(object):
         print(least, most, mean)
         self.mappingDict = {'least':  least, 'mean': mean, 'most': most}  
         self.blocksMapping = mapped
+
+    def getCapacity(self):
+        capasity = 0
+        for blockClassMap in self.blocksMapping: 
+            blockClass = blockClassMap[0] + blockClassMap[1]
+
+            if (blockClass == self.mappingDict.get('most')):
+                continue
+
+            if (blockClass == self.mappingDict.get('mean')):
+                capasity += 1 * 8 * 8 * 3 - 2
+            
+            if (blockClass == self.mappingDict.get('least')):
+                capasity += 2 * 8 * 8 * 3 - 2
+                              
+        return capasity
+
+     
+    def plot3d(self, x, y, z, mapping='', neurons='', path=''):
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        if mapping != '':
+            for _x, _y, _z, m in zip(x, y, z, mapping):
+                c = m[0] + m[1] 
+                color = 'red' if c == 0 else ('green' if c == 1 else 'blue')              
+                ax.scatter(_x, _y, _z, c=color, s=0.8)
+
+            if neurons != '':
+                i = 1
+                for neuron in neurons:
+                    i += 1
+                    ax.scatter(neuron[0][0], neuron[0][1], neuron[0][2], marker='x', c='black', label='Neuron location' + str(i))
+            
+        else:
+            ax.scatter(x, y, z, s=0.8)
         
+        ax.set_xlabel('mean horizontal contrast')
+        ax.set_ylabel('mean diagonal contrast')
+        ax.set_zlabel('mean vertical contrast')    
+        # plt.show()
+        if path != '':
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+            # Put a legend to the right of the current axis
+            ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+            fig.savefig(path, format='eps',  dpi=1000)
+        else:
+            plt.show()  
+
 def textToBin(text):
     return ''.join(str(x) for x in list(map(int, ''.join([bin(ord(i)).lstrip('0b').rjust(8,'0') for i in text]))))
 

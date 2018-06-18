@@ -33,6 +33,8 @@ class Steganography(object):
             self.image.divided = k.image
             self.image.joinBlocks()
             self.image.toImage(self.newPath)
+            print('Capacity  ' , k.getCapacity())        
+            
    
 
     def decrypt(self):

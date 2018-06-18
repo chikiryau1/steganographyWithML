@@ -12,7 +12,6 @@ class LSB(object):
         """
         messageStep = 0
         msg = textToBin(self.message)
-        print(len(msg) / 8)
         self.key = len(msg)
         for i in range(len(self.image)):
             if(messageStep == len(msg)):

@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
+from matplotlib import pyplot as plt
  
 class SOM(object):
     """
@@ -202,3 +203,4 @@ class SOM(object):
             to_return.append(self._locations[min_index])
  
         return to_return
+   

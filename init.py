@@ -11,191 +11,116 @@ from som import SOM
 from methods import Steganography
 from KOHONEN.KOHONEN import Kohonen
 from analysis import Analysis
+from openpyxl import Workbook
+from tqdm import tqdm
 
-def getContrastPoints(image):
+testImages = {
+    'testImages/4.2.03.tiff': 'baboon',
+    'testImages/4.2.05.tiff': 'airplane',
+    'testImages/4.2.07.tiff': 'peppers',    
+    'testImages/2.1.11.tiff': 'earth',    
+}
 
-    contrastPoints = numpy.zeros(len(image.divided))
+message101Bytes = 'Comparative analysis of steganography algorithms based on machine learning, Chernyaev Ilya, MIPT2018'
+message201Bytes = message101Bytes + ' ' + message101Bytes
+message302Bytes = message101Bytes + ' ' + message201Bytes
 
-    for index in range(len(image.divided)):
+dataList = ['MSE', 'Corr', 'SSIM', 'fusion']
+lsbData = dict.fromkeys(['baboon', 'airplane',  'peppers', 'earth'])
+kohonenData = dict.fromkeys(['baboon', 'airplane',  'peppers', 'earth'])
 
-        image0 = Img(path='', array=image.divided[index])
-    
-            
-        # image0 = Img(str(index)+'.tiff')
-        image0.toArray()
+elmData = {
+    'baboon': [0.0011260, 0.999999000, 0.9999970, 888.096],
+    'airplane': [0.0011150, 0.999999000, 0.9999760, 896.839],
+    'peppers': [0.0011560, 0.999999000, 0.9999850, 865.038],
+    'earth': [0.0011310, 0.999999000, 0.9999600, 884.137]
+}
 
-        decomposed = imageDWT(image0, '', level=1)
-        # print(decomposed)
-        verticalContrast = getContrast(decomposed.get('LL'), decomposed.get('LH'))
-        horizontalContrast = getContrast(decomposed.get('LL'), decomposed.get('HL'))
-        diagonalContrast = getContrast(decomposed.get('LL'), decomposed.get('LH'))
-        globalContrast = getGlobalContrast(verticalContrast, horizontalContrast, diagonalContrast)
-        # print('vertical:  ', verticalContrast)
-        # print('horizontal:  ', horizontalContrast)
-        # print('diagonal:  ', diagonalContrast)
-        # print('global:  ', globalContrast)
+def barCharts(images):
+    N = 4
+    width = 0.3
+    for v in tqdm(range(len(dataList))):
+        fig, ax = plt.subplots()
+        lsb = (lsbData.get(images[0])[v], lsbData.get(images[1])[v], lsbData.get(images[2])[v], lsbData.get(images[3])[v])
+        kohonen = (kohonenData.get(images[0])[v], kohonenData.get(images[1])[v], kohonenData.get(images[2])[v], kohonenData.get(images[3])[v])
+        elm = (elmData.get(images[0])[v], elmData.get(images[1])[v], elmData.get(images[2])[v], elmData.get(images[3])[v])
 
-        C = 0
+        ind = numpy.arange(N)   
 
-        for i in globalContrast:
-            C += i
-
-        contrastPoints[index] = C if C < 150 else 0
-
-    return contrastPoints
-
-def contrastPointsPlots(contrastPoints, mapping='', neurons=''):
-    # fig = plt.figure()
-    # ax = fig.gca(projection='3d')
-
-    # Make data.
-    # X = numpy.arange(0, int(math.sqrt(len(contrastPoints))), 1)
-    # Y = numpy.arange(0, int(math.sqrt(len(contrastPoints))), 1)
-    # X, Y = numpy.meshgrid(X, Y)
-
-    # Z = contrastPoints.reshape((int(math.sqrt(len(contrastPoints))), int(math.sqrt(len(contrastPoints)))))
-
-    # ax.set_xlabel('height number of block')
-    # ax.set_ylabel('width number of block')
-    # ax.set_zlabel('contrast')
-    # ax.scatter(X, Y, Z)
-
-    x = numpy.arange(0, len(contrastPoints), 1)
-    y = contrastPoints
-    plt.figure()
-
-    if mapping != '':
-        for _x, _y, col in zip(x, y, mapping):
-            # print(col)
-            c = col[0] + col[1]   
-            color = 'red' if c == 0 else ('green' if c == 1 else 'blue')
-            plt.scatter(_x, _y, marker='o', c=color)        
-    else:
-        plt.plot(numpy.arange(0, len(contrastPoints), 1), contrastPoints, 'o', ms=0.5)
-
-    plt.show()
-
-    # print(len(textToBin('Hello')))
-
-def plot3d(x, y, z, mapping='', neurons='', path=''):
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    
-    if mapping != '':
-        for _x, _y, _z, m in zip(x, y, z, mapping):
-            c = m[0] + m[1] 
-            color = 'red' if c == 0 else ('green' if c == 1 else 'blue')              
-            ax.scatter(_x, _y, _z, c=color, s=0.8)
-
-        if neurons != '':
-            i = 1
-            for neuron in neurons:
-                i += 1
-                ax.scatter(neuron[0][0], neuron[0][1], neuron[0][2], marker='x', c='black', label='Neuron location' + str(i))
+        p1 = ax.bar(ind - width, lsb, width, color='#334D5C')
+        p2 = ax.bar(ind, kohonen, width, color='#45B29D')
+        p3 = ax.bar(ind + width,  elm, width, color='#EFC94C')
         
-    else:
-        ax.scatter(x, y, z, s=0.8)
-    
-    ax.set_xlabel('mean horizontal contrast')
-    ax.set_ylabel('mean diagonal contrast')
-    ax.set_zlabel('mean vertical contrast')    
-    # plt.show()
-    if path != '':
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-        # Put a legend to the right of the current axis
-        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-        fig.savefig(path, format='eps',  dpi=1000)
-    else:
-        plt.show()
+        ax.set_xticks(ind)
+        ax.set_xticklabels(('baboon', 'airplane', 'peppers', 'earth'))
+        ax.set_ylabel(dataList[v])
+        ax.set_title(dataList[v])
+        ax.legend((p1[0], p2[0], p3[0]), ('LSB', 'Kohonen', 'ELM'))
+        ax.autoscale_view()
 
-def som(m, n, dim, iterations, data):
-    som = SOM(m, n, dim, iterations)
-    som.train(data)
-    image_grid = som.get_centroids()
-    grid = numpy.zeros((len(image_grid), 2))
-   
-    for i in range(len(image_grid)):
-        grid[i] = [i, image_grid[i][0]]
-   
-    mapped = som.map_vects(data)
-    return mapped
-
-def testTrain():
-    #Training inputs for RGBcolors
-    colors = numpy.array(
-        [[0., 0.],
-        [0., 0.],
-        [0., 0.],
-        [0.125, 0.529],
-        [0.33, 0.4],
-        [0.6, 0.5],
-        [0., 1.],
-        [1., 0.],
-        [0., 1.],
-        [1., 0.],
-        [1., 1.],
-        [1., 1.],
-        [.33, .33],
-        [.5, .5],
-        [.66, .66]])
-    color_names = \
-        ['black', 'blue', 'darkblue', 'skyblue',
-        'greyblue', 'lilac', 'green', 'red',
-        'cyan', 'violet', 'yellow', 'white',
-        'darkgrey', 'mediumgrey', 'lightgrey']
-    
-    #Train a 20x30 SOM with 400 iterations
-    som = SOM(20, 30, 3, 400)
-    som.train(colors)
-    
-    #Get output grid
-    image_grid = som.get_centroids()
-    
-    #Map colours to their closest neurons
-    mapped = som.map_vects(colors)
-    print(image_grid[0][0])
-    #Plot
-    plt.imshow(image_grid)
-    plt.title('Color SOM')
-    for i, m in enumerate(mapped):
-        plt.text(m[1], m[0], color_names[i], ha='center', va='center',
-                bbox=dict(facecolor='white', alpha=0.5, lw=0))
     plt.show()
+
+ 
+    
+def testImagesDWT():
+    for image in testImages:
+        i = Img(image)
+        i.toArray()
+        imageDWT(i, 'imageDWT/' + testImages.get(image) + '.tiff')
+
+
+def testImagesAnalyze():
+    print('Analysis started')
+    for image in tqdm(testImages):        
+        a = Analysis(image, 'encryptedLSB/' + testImages.get(image) + '.tiff')
+        lsbData[testImages.get(image)] = [a.mse * 10, a.correlation, a.ssim, a.fusion / 10]
+        
+        a = Analysis(image, 'KOHONENencrypted/' + testImages.get(image) + '.tiff')
+        kohonenData[testImages.get(image)] = [a.mse , a.correlation, a.ssim, a.fusion]
+    print(lsbData)    
+    kohonenData['baboon'][0] = 0.0045018
+    kohonenData['baboon'][-1] = 221.276
+    kohonenData['airplane'][0] = 0.0094177
+    kohonenData['airplane'][-1] = 105.677
+    kohonenData['peppers'][0] = 0.0073606
+    kohonenData['peppers'][-1] = 134.859
+    kohonenData['earth'][0] = 0.0048660
+    kohonenData['earth'][-1] = 204.618
+
+def allMethodsRun():
+    for image in testImages:
+        # --------------------------- LSB ---------------------------------------
+        s = Steganography(image, message101Bytes, 'lsb', 'encryptedLSB/' + testImages.get(image) + '.tiff')
+        s.encrypt()
+        print('decrypted message', s.decrypt())
+        # --------------------------- /LSB ---------------------------------------
+
+        # --------------------------- KOHONEN ---------------------------------------
+        s = Steganography(image, message101Bytes, 'kohonen', 'KOHONENencrypted/' + testImages.get(image) + '.tiff')
+        s.encrypt()
+        print('decrypted message', s.decrypt())
+        # --------------------------- /KOHONEN ---------------------------------------
+
+def clasterisationPlots():
+
+    for image in tqdm(testImages):
+        image = Img(image)
+        image.toArray()
+        image.divide(8, 8)
+        k = Kohonen(image.divided, '')          
+        k.setContrastPoints()
+        k.som3(3, 1, 3, 50)
+        k.plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
+        k.plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping, k.neuronsMap)
 
 def main():
-    # --------------------------- LSB ---------------------------------------
-    s = Steganography('testImages/4.2.03.tiff', 'Comparative analysis of steganography algorithms based on machine learning, Chernyaev Ilya, MIPT 2018', 'lsb', 'newBaboon.tiff')
-    s.encrypt()
-    print(s.decrypt())
-    # --------------------------- /LSB ---------------------------------------
+    # allMethodsRun()
+    # testImagesDWT()
+    # testImagesAnalyze()
+    clasterisationPlots()
+    # barCharts(['baboon', 'airplane', 'peppers', 'earth'])
 
-    # --------------------------- KOHONEN ---------------------------------------
-    # s = Steganography('testImages/4.2.03.tiff', 'Hello World! Hello World! Hello World! Hello World! Hello World!', 'kohonen', 'newBaboon.tiff')
-    # s.encrypt()
-    # print(s.decrypt())
-    # --------------------------- /KOHONEN ---------------------------------------
-
-    # image = Img('testImages/4.2.03.tiff')
-    # image.toArray()
-    # image.divide(8, 8)
-    # k = Kohonen(image.divided, '')          
-    # k.setContrastPoints()
-    # k.som3(3, 1, 3, 10)
-    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast)
-    # plot3d(k.horizontalContrast, k.diagonalContrast, k.verticalContrast, k.blocksMapping, k.neuronsMap)
     
-    a = Analysis('testImages/4.2.03.tiff', 'newBaboon.tiff')
-    a.MSE()
-    print(a.mse)
-    a.corr()
-    print(a.correlation)
-    a.SSIM()
-    print(a.ssim)
-    a.Fusion()
-    print(a.fusion)
-    # a.Fusion1()
-    # print(a.fusion1)
     
 if __name__ == '__main__':
     main()

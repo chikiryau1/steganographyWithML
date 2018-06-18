@@ -12,6 +12,10 @@ class Analysis(object):
         self.stego = stego.RGB
         h,w,_ = self.original.shape
         self.numPixels = h * w
+        self.MSE()
+        self.corr()
+        self.SSIM()
+        self.Fusion()
 
     def MSE(self):
         mse = 0
@@ -75,4 +79,5 @@ class Analysis(object):
     def Fusion1(self):
         self.fusion1 = self.correlation * self.ssim
 
+    
     
