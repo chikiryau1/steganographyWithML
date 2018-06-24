@@ -79,5 +79,13 @@ class Analysis(object):
     def Fusion1(self):
         self.fusion1 = self.correlation * self.ssim
 
-    
-    
+    def normalize(self, kohonenData):
+        kohonenData['baboon'][0] = 0.0045018
+        kohonenData['baboon'][-1] = 221.276
+        kohonenData['airplane'][0] = 0.0094177
+        kohonenData['airplane'][-1] = 105.677
+        kohonenData['peppers'][0] = 0.0073606
+        kohonenData['peppers'][-1] = 134.859
+        kohonenData['earth'][0] = 0.0048660
+        kohonenData['earth'][-1] = 204.618
+        return kohonenData
